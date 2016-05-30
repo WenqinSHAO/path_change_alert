@@ -24,7 +24,7 @@ It is then interesting to separate the IP path changes caused by intra-domain ro
 We can infer inter-domain routing changes by detecting the change on IP paths associated to a same flow-id.
 
 # Existing project
-A previous award-wining project [Traceroute-consistency-check](https://github.com/vdidonato/Traceroute-consistency-check) could be of use in constructing this project.
+A previous award-wining projects [BGP traceroutes](https://github.com/wires/bgp-traceroutes.git) and [Traceroute-consistency-check](https://github.com/vdidonato/Traceroute-consistency-check) could be of use in constructing this project.
 
 # Future extension
 One promising extension is to first detect the moment of major RTT changes for streaming ping measurements.
