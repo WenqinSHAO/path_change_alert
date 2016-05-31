@@ -1,28 +1,70 @@
 from ripe.atlas.cousteau import AtlasResultsRequest
+from ripe.atlas.sagan import TracerouteResult
+from multiprocessing import Process
+import time
 
 
-class PathRec(object):
-    def __init__(self, query):
+class PathRec(Process):
+    """
+    If a query is provided when initiating the obj,
+    hist path records are quryied to construct the major path patterns.
+    The process reads from a queue the streaming result and then:
+    1/ update the path pattern structure;
+    2/ detect path pattern change.
+    """
+    def __init__(self, mes_queue, report_queue, query={}):
         if query:
             is_success, res = AtlasResultsRequest(**query).create()
             if is_success:
-                self.pattern = self.learnpattern(res)
+                self.pattern = self.learn_pattern(res)
         else:
             self.pattern = {}
+        self.mes_queue = mes_queue
+        self.report_queue = report_queue
+        super(PathRec, self).__init__()
 
-    def update(self):
-        '''given a measurement, update pattern'''
+    def run(self):
+        while True:
+            if self.mes_queue.empty():
+                time.sleep(1)
+            else:
+                mes = self.mes_queue.get()
+                if mes != 'STOP':
+                    self.update(mes)
+                    self.detect()
+                else:
+                    print '{0} received end signal.'.format(self.name)
+                    self.report_queue.put('STOP')
+                    return
 
-    def learnpattern(self):
-        '''given a historical records, learn pattern'''
+    def detect(self):
+        """given a measurement, detect if it is a change"""
+        last_rec = self.pattern[-1]
+        if last_rec.last_median_rtt > 100:
+            self.report_queue.put(last_rec)
 
+    def update(self, mes):
+        """given a measurement, update pattern"""
+        self.pattern.append(TracerouteResult(mes))
 
-    # TODO: think about using ripe.atlas.sagan, maybe it's an overkill
-    def traceFormatter(res_json):
-        '''Given a json object containing multiple traceroute measurements,
+    def learn_pattern(self, mes):
+        """given a historical records, learn pattern"""
+        return self.trace_formatter(mes)
+
+    @staticmethod
+    def trace_formatter(res_json):
+        res_list = []
+        for rec in res_json:
+            rec_sagan = TracerouteResult(rec)
+            res_list.append(rec_sagan)
+        return res_list
+
+    @staticmethod
+    def trace_formatter_old(res_json):
+        """Given a json object containing multiple traceroute measurements,
         reture a list of dictionary.
         The order of elements is the same as the json obj.
-        Each element of the list, a dictionary, correspond to one measurement.'''
+        Each element of the list, a dictionary, correspond to one measurement."""
         # suppose there is only one unique tuple of msm and prb id in json obj
         res_list = []
         for rec in res_json:
