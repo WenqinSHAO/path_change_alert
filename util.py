@@ -7,17 +7,32 @@ TRACE_INTV = 1800  # the built-in traceroute interval is 30min
 
 def sagan_ip_path(trace):
     """given an sagan traceroute measurement obj,
-    return a list of IP hop, each hop contain only one IP address"""
+    return a list of IP hop, each hop contain only one IP address.
+
+    Args:
+        trace (ripe.atlas.sagan.traceroute.TracerouteResult): one single instance of traceroute measurement;
+            in sagan object, for each hop, have at most three IP address.
+
+    Returns:
+        single_path (list): e.x. ['137.194.164.254', '137.194.4.240', '212.73.200.45', ...]
+            that is one IP per hop
+    """
     single_path = []
     full_path = trace.ip_path
     for hops in full_path:
-        single_path.append(Counter(hops).most_common(1))
+        single_path.append(Counter(hops).most_common(1)[0][0])
     return single_path
 
 
 def trace_formatter(res_json):
-    """given a json object containing multiple traceroute measurements,
-    return a list of sagan traceroute obj"""
+    """format mutiple traceroute measurements in json
+
+    Args:
+        res_json (list): list of traceroute measurments in dict(json) format
+
+    Returns:
+        res_list (list): list of ripe.atlas.sagan.traceroute.TracerouteResult
+    """
     res_list = []
     for rec in res_json:
         rec_sagan = TracerouteResult(rec)
@@ -27,7 +42,15 @@ def trace_formatter(res_json):
 
 def polish(path_list):
     """given a list of such tuple (pid, path, timestamp),
-    pad the list where pid is not continuous"""
+    pad the list where pid is not continuous
+
+    Args:
+        path_list: list of such tuple (pid(int), path(list), timestamp(int))
+
+    Returns:
+        path_list: list of such tuple (pid(int), path(list), timestamp(int))
+
+    """
     prev = 0
     cur = 1
     while cur < len(path_list):
@@ -49,7 +72,18 @@ def polish(path_list):
 
 def path_seg(path_list):
     """given a list of of paths whose corresponding pids are continuous,
-    segment the list so that no pid within the seg take different paths"""
+    segment the list so that no pid within the seg take different paths
+
+
+    Args:
+        path_list (list): list of ip path (list of strings)
+
+    Returns:
+        seg_bg (list): int, index where a new segment begins;
+
+    Notes:
+        the last element in seg_bg equals the length of path_list, thus outside the path_list index range
+    """
     tLen = len(path_list)
     seg_bg = [0]  # stores the beginning index of each segment
     begin = 0
@@ -92,7 +126,19 @@ def path_seg(path_list):
 
 
 def learn_pattern(mes):
-    """given a historical records in json format, learn pattern and their counts"""
+    """given a historical traceroute records, learn patterns and their counts
+
+
+    Args:
+        mes (list): list of traceroute measurements in dict(json) format
+
+    Returns:
+        pattern_dict (dict): {hash_code of pattern: {'obj': PathPattern(), 'count': XX}}
+            the data structure that stores pattern and its count
+
+    Notes:
+        Only complete pattern that having 17 continuous paris id is counted.
+    """
     res_sagan = trace_formatter(mes)
     path_list = []
     pattern_dict = {}  # {hash_code of pattern: {'obj': PathPattern(), 'count': XX}}
