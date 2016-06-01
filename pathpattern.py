@@ -10,26 +10,26 @@ class PathPattern(object):
         is_complete (boolean): tells if the path pattern contains all the 16 paris id
 
     """
-    def __init__(self, **kwargs):
+    def __init__(self, dict):
         """
 
         Args:
-             **kwargs: supposed to be a dictionary {pid(int): path(list of strings)}
+             dict: supposed to be a dictionary {pid(int): path(list of strings)}
         """
-        self.pid2path = kwargs
+        self.pid2path = dict
         self.ordered_path = self.__get_path_ordered()
         self.ordered_pid = self.__get_pid_ordered()
         self.hash_code = self.__calc_hash()
         self.is_complete = self.__is_complete()
 
-    def update(self, **kwargs):
+    def update(self, dict):
         """Update the path pattern with given pid path pairs.
 
         Args:
-            **kwargs: supposed to be a dictionary {pid(int): path(list of strings)}
+            dict: supposed to be a dictionary {pid(int): path(list of strings)}
 
         """
-        for pid, path in kwargs.iteritems():
+        for pid, path in dict.iteritems():
             self.pid2path[pid] = path
         self.ordered_path = self.__get_path_ordered()
         self.ordered_pid = self.__get_pid_ordered()
@@ -38,7 +38,7 @@ class PathPattern(object):
 
     def __calc_hash(self):
         """calculate the hash code for the path pattern"""
-        return hash(self.ordered_path)
+        return hash(str(self.ordered_path))
 
     def __get_path_ordered(self):
         """form ordered paths"""

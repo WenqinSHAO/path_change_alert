@@ -158,7 +158,7 @@ def learn_pattern(mes):
         p = path_list[bg:ed]
         if len(p) > SUBLEN:
             p_dict = dict((pid, path) for (pid, path, tstp) in p)
-            p_pattern = PathPattern(**p_dict)
+            p_pattern = PathPattern(p_dict)
             if p_pattern.hash_code not in pattern_dict.keys():
                 pattern_dict[p_pattern.hash_code] = {'obj': p_pattern,
                                                      'count': len(p)}

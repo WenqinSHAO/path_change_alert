@@ -44,7 +44,7 @@ class PathRec(Process):
             self.pattern = []
         self.mes_queue = mes_queue
         self.report_queue = report_queue
-        self.cur_pattern = PathPattern(**{})
+        self.cur_pattern = PathPattern({})
         self.cur_pattern_match = False
         self.last_three = deque([], 3)
         super(PathRec, self).__init__()
@@ -107,8 +107,8 @@ class PathRec(Process):
                     res_sagan = trace_formatter(self.last_three)
                     l3_p = {}
                     for rec in res_sagan:
-                        test_p[rec.paris_id] = sagan_ip_path(rec)
-                    l3_pptn = PathPattern(**l3_p)
+                        l3_p[rec.paris_id] = sagan_ip_path(rec)
+                    l3_pptn = PathPattern(l3_p)
                     if self.match_existing_pptn(l3_pptn):
                         # if last three path matches one complete pattern,
                         # the first one of the three is marked as change
@@ -117,7 +117,7 @@ class PathRec(Process):
                         self.cur_pattern_match = True
                     else:
                         # updating the current pattern that matches on one"""
-                        self.cur_pattern.update(**new_p)
+                        self.cur_pattern.update(new_p)
         return
 
     def match_existing_pptn(self, pptn):

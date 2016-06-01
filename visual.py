@@ -1,4 +1,5 @@
 from multiprocessing import Process
+from ripe.atlas.sagan import TracerouteResult
 import time
 
 
@@ -17,10 +18,11 @@ class Visual(Process):
             else:
                 task = self.queue.get()
                 if task != 'STOP':
+                    trace_sagan = TracerouteResult(task)
                     print '{p.measurement_id:>12}:{p.probe_id} @ ' \
                           '{p.end_time}\n' \
                           '{p.last_median_rtt:6.2f}msec\n' \
-                          '{p.ip_path}'.format(p=task)
+                          '{p.ip_path}'.format(p=trace_sagan)
                 else:
                     print '{0} received end signal.'.format(self.name)
                     return

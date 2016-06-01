@@ -15,14 +15,14 @@ def main():
         mes_q = Queue()
         param = {"msm": mes[0],
                  "prb": mes[1],
-                 "startTime": int(now - 24 * 3600),
+                 "startTime": int(now - 24 * 7 * 3600),
                  "speed": 100}
         streamer = Streaming(queue=mes_q, param=param)
         streamer.start()
         query = {"msm_id": mes[0],
                  "probe_ids": [mes[1]],
-                 "start": int(now-48*3600),
-                 "stop": int(now-24*3600)}
+                 "start": int(now - 24 * 14 * 3600),
+                 "stop": int(now - 24 * 7 * 3600)}
         analyzer = PathRec(mes_queue=mes_q, report_queue=rep_q, query=query)
         analyzer.start()
         mes_worker.append((streamer, analyzer))
