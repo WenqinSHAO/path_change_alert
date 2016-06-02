@@ -5,6 +5,7 @@ from pathpattern import PathPattern
 from util import sagan_ip_path
 from copy import deepcopy
 from collections import deque
+import Queue
 import time
 from util import learn_pattern, SUBLEN, trace_formatter
 
@@ -55,10 +56,11 @@ class PathRec(Process):
             2/ report changes to the report_queue
         """
         while True:
-            if self.mes_queue.empty():
-                time.sleep(1)
+            try:
+                mes = self.mes_queue.get(False)  # don't block
+            except Queue.Empty:
+                time.sleep(5)
             else:
-                mes = self.mes_queue.get()
                 if mes != 'STOP':
                     self.last_three.append(mes)
                     self.detect(mes)
