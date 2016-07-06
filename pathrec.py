@@ -50,6 +50,7 @@ class PathRec(Process):
         self.last_three = deque([], 3)
         super(PathRec, self).__init__()
 
+    # TODO: streaming data form has changed; need corresponding modification
     def run(self):
         """what should be doing when the process is started:
             1/ get stream results from the mes_queue

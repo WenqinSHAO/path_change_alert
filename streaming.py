@@ -18,7 +18,7 @@ class Streaming(Process):
         stream (ripe.atlas.cousteau.AtlasStream): the stuff does the real streaming job.
     """
 
-    def __init__(self, queue, second=None, param={}):
+    def __init__(self, vis_q, analyze_q, second=None, param={}):
         """
         Args:
             duration (int): how long the streaming shall last, if None, it will last forever.
@@ -27,19 +27,21 @@ class Streaming(Process):
         """
         self.duration = second
         self.param = param
-        self.queue = queue
+        self.id = (param['msm'], param['prb'])
+        self.vis = vis_q
+        self.analyze = analyze_q
         self.stream = AtlasStream()
         super(Streaming, self).__init__()
 
     def run(self):
-        """What should be doing when the prcess is started.
+        """What should be doing when the process is started.
         """
         self.stream.connect()
         self.stream.bind_channel('result', self.on_result_recieved)
         self.stream.start_stream(stream_type="result", **self.param)
         self.stream.timeout(seconds=self.duration)
         self.stream.disconnect()
-        self.queue.put('STOP')
+        self.analyze.put('STOP')
         return
 
     def on_result_recieved(self, *args):
@@ -48,4 +50,6 @@ class Streaming(Process):
         Args:
             *args: args[0] contains the right json object as per RIPE documentation.
         """
-        self.queue.put(args[0])
+        print '{0} received streaming data.'.format(self.name)
+        self.vis.put(dict(id=self.id, type='mes', rec=args[0]))
+        self.analyze.put(dict(id=self.id, rec=args[0]))
