@@ -25,7 +25,7 @@ def main():
     vis_q = Queue()
     analyze_q = Queue()
 
-    start = string_to_epoch('20/01/2016 8:00:00')
+    start = string_to_epoch('20/01/2016 06:00:00')
     mes_list = [(1010, 10772)]
     mes_worker = []
 
