@@ -1,6 +1,7 @@
 import time
 import calendar
 from streaming import Streaming
+from fastplayback import Fastplayback
 from delayAnalyzer import DelayAnalyzer
 from visual import Visual
 from multiprocessing import Queue
@@ -26,15 +27,16 @@ def main():
     analyze_q = Queue()
 
     start = string_to_epoch('20/01/2016 06:00:00')
+    end = string_to_epoch('20/02/2016 06:00:00')
     mes_list = [(1010, 10772)]
     mes_worker = []
 
     for mes in mes_list:
-        param = {"msm": mes[0],
-                 "prb": mes[1],
-                 "startTime": start,
-                 "speed": 15}
-        streamer = Streaming(vis_q=vis_q, analyze_q=analyze_q, second=3600, param=param)
+        param = dict(msm_id=mes[0],
+                     probe_ids=[mes[1]],
+                     start=start,
+                     stop=end)
+        streamer = Fastplayback(vis_q=vis_q, analyze_q=analyze_q, interval=1, query=param)
         streamer.start()
         analyzer = DelayAnalyzer(vis_q=vis_q, analyze_q=analyze_q)
         analyzer.start()

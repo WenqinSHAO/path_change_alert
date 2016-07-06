@@ -28,7 +28,7 @@ class DelayAnalyzer(Process):
                         last_four = self.rec[-5:-1]
                         if rtt > 1.2 * np.median(last_four):
                             print '{0} signaled an alert.'.format(self.name)
-                            self.vis.put(dict(id=id_, type='alert', rec=[rtt]))
+                            self.vis.put(dict(id=id_, type='alert', rec=mes['rec']))
                 else:
                     print '{0} received end signal.'.format(self.name)
                     self.vis.put('STOP')
