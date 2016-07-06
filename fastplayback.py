@@ -21,7 +21,6 @@ class Fastplayback(Process):
     def run(self):
         if self.rec:
             for mes in self.rec:
-                self.vis.put(dict(id=self.id, type='mes', rec=mes))
                 self.analyze.put(dict(id=self.id, rec=mes))
                 time.sleep(self.interval)
         self.analyze.put('STOP')

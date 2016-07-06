@@ -1,10 +1,9 @@
 import time
 import calendar
-from streaming import Streaming
 from fastplayback import Fastplayback
 from delayAnalyzer import DelayAnalyzer
 from visual import Visual
-from multiprocessing import Queue
+from multiprocessing import Queue, Manager
 
 
 def string_to_epoch(str):
@@ -25,9 +24,10 @@ def string_to_epoch(str):
 def main():
     vis_q = Queue()
     analyze_q = Queue()
+    analyze_setting = Manager().dict(bias=10, minlen=10)
 
     start = string_to_epoch('20/01/2016 06:00:00')
-    end = string_to_epoch('20/02/2016 06:00:00')
+    end = string_to_epoch('27/01/2016 06:00:00')
     mes_list = [(1010, 10772)]
     mes_worker = []
 
@@ -38,11 +38,11 @@ def main():
                      stop=end)
         streamer = Fastplayback(vis_q=vis_q, analyze_q=analyze_q, interval=1, query=param)
         streamer.start()
-        analyzer = DelayAnalyzer(vis_q=vis_q, analyze_q=analyze_q)
+        analyzer = DelayAnalyzer(vis_q=vis_q, analyze_q=analyze_q, config=analyze_setting)
         analyzer.start()
         mes_worker.append((streamer, analyzer))
 
-    reporter = Visual(vis_q=vis_q)
+    reporter = Visual(vis_q=vis_q, config=analyze_setting)
     reporter.start()
 
     for st, ana in mes_worker:
