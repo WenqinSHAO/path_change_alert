@@ -18,7 +18,7 @@ class Visual(Process):
         self.loss = ColumnDataSource(dict(x=[], y=[]))
         self.base = ColumnDataSource(dict(x=[], y=[]))
         self.rec = []
-        self.p = figure(width=1200, height=800, x_axis_type="datetime", title='Streaming demo',
+        self.p = figure(width=800, height=400, x_axis_type="datetime", title='Streaming demo',
                         tools="xpan,xwheel_zoom,xbox_zoom,reset")
         self.p.border_fill_color = "whitesmoke"
         self.p.min_border_left = 80
@@ -38,7 +38,7 @@ class Visual(Process):
         self.session = push_session(self.doc)
         self.doc.add_root(column(row(self.bias, self.minlen), self.p))
         self.doc.add_periodic_callback(self.update, 500)
-        self.doc.title = "Streaming demo"
+        self.doc.title = "Streaming Demo"
         self.session.show()
         self.session.loop_until_closed()  # if not add, nothing will show on the screen, yet if added, process can not be joined...
         super(Visual, self).__init__()
