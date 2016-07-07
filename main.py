@@ -9,6 +9,7 @@ from bokeh.models import ColumnDataSource, Slider
 from bokeh.layouts import row, column
 import Queue as NQ
 
+
 def string_to_epoch(str):
     """translate an UTC time string to epoch time
 
@@ -25,7 +26,7 @@ def string_to_epoch(str):
 
 
 def update():
-    analyze_setting['bais'] = bias.value
+    analyze_setting['bias'] = bias.value
     analyze_setting['minlen'] = minlen.value
     try:
         task = vis_q.get(False)
@@ -33,8 +34,8 @@ def update():
         pass
     else:
         if task != 'STOP':
-            print 'BOKEH received new data.'
             if task['type'] == 'base':
+                #print "BOKEH: Baseline update."
                 base.stream(task['rec'])
             else:
                 one_mes = PingResult(task['rec'])
@@ -43,15 +44,17 @@ def update():
                     rec.append(one_mes.rtt_min)
                     mes.stream(new_data)
                 elif task['type'] == 'alert':
+                    #print "BOKEH: Alert received."
                     alert.stream(new_data)
                 elif task['type'] == 'loss':
+                    #print "BOKEH: Loss reported."
                     if rec:
                         new_data['y'] = [rec[-1]]
                     else:
                         new_data['y'] = [20]
                         loss.stream(new_data)
         else:
-            print 'BOKEH received STOP signal.'
+            print 'BOKEH: received STOP signal.'
 
 vis_q = Queue()
 analyze_q = Queue()
