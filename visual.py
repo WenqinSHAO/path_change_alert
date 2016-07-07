@@ -18,7 +18,7 @@ class Visual(Process):
         self.loss = ColumnDataSource(dict(x=[], y=[]))
         self.base = ColumnDataSource(dict(x=[], y=[]))
         self.rec = []
-        self.p = figure(width=1200, height=800, x_axis_type="datetime", title='Streaming demo',
+        self.p = figure(width=600, height=400, x_axis_type="datetime", title='Streaming demo',
                         tools="xpan,xwheel_zoom,xbox_zoom,reset")
         self.p.border_fill_color = "whitesmoke"
         self.p.min_border_left = 80
