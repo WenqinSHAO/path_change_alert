@@ -7,6 +7,7 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import IntVector
 changepoint = importr('changepoint')
 
+MAX_LEN = 20
 
 class DelayAnalyzer(Process):
     def __init__(self, analyze_q, vis_q, config):
@@ -15,7 +16,7 @@ class DelayAnalyzer(Process):
         self.config = config
         self.rec_raw = []
         self.rec_rtt = []
-        self.baseline = 9999
+        #self.baseline = 9999
         self.bias = 10
         self.minlen = 10
         super(DelayAnalyzer, self).__init__()
@@ -29,7 +30,7 @@ class DelayAnalyzer(Process):
             try:
                 mes = self.analyze.get(False)  # don't block
             except Queue.Empty:
-                time.sleep(.1)
+                pass
             else:
                 if mes != 'STOP':
                     id_ = mes['id']
@@ -44,17 +45,26 @@ class DelayAnalyzer(Process):
                         self.vis.put(dict(id=id_, type='loss', rec=mes['rec']))
                     if len(self.rec_raw) >= self.minlen:
                         data = [int(round(i)) for i in self.rec_rtt]
-                        data_min = min(np.min(data), self.baseline)
-                        self.baseline = data_min
-                        data = [i-data_min+self.bias for i in data]
-                        self.vis.put(dict(id=id, type='base', rec=dict(x=[tstp_dt], y=[data_min-self.bias])))
+
+                        data_len = len(data)
+                        adj = 0
+                        if data_len > MAX_LEN:
+                            data = data[-MAX_LEN:]
+                            adj = data_len - MAX_LEN
+
+                        data_ref = np.max(np.min(data)-np.std(data)*1.75, 0)
+                        #self.baseline = data_min
+                        data = [i-data_ref+self.bias for i in data]
+                        self.vis.put(dict(id=id, type='base', rec=dict(x=[tstp_dt], y=[data_ref - self.bias])))
+
                         data = IntVector(data)
                         cpt = changepoint.cpts(changepoint.cpt_meanvar(data, test_stat='Poisson', method='PELT'))
                         if cpt:
                             print '{0}: signaled an alert.'.format(self.name)
-                            self.vis.put(dict(id=id_, type='alert', rec=self.rec_raw[cpt[0]+1]))
-                            self.rec_raw = self.rec_raw[cpt[0]+1:]
-                            self.rec_rtt = self.rec_rtt[cpt[0]+1:]
+                            cpt_idx = cpt[0] + adj
+                            self.vis.put(dict(id=id_, type='alert', rec=self.rec_raw[cpt_idx]))
+                            self.rec_raw = self.rec_raw[cpt_idx:]
+                            self.rec_rtt = self.rec_rtt[cpt_idx:]
                 else:
                     #print '{0} received end signal.'.format(self.name)
                     self.vis.put('STOP')

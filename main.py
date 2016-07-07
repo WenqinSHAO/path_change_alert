@@ -79,9 +79,11 @@ vis_q = Queue()
 analyze_q = Queue()
 analyze_setting = Manager().dict(bias=10, minlen=10)
 
-start = string_to_epoch('20/01/2016 06:00:00')
+start = string_to_epoch('21/01/2016 17:00:00')
+#start = string_to_epoch('20/01/2016 06:00:00')
 end = string_to_epoch('27/01/2016 06:00:00')
-mes_list = [(1010, 10772)]
+mes_list = [(1010, 21959)]
+#mes_list=[(1010, 10772)]
 mes_worker = []
 
 for mes in mes_list:
@@ -89,7 +91,7 @@ for mes in mes_list:
                  probe_ids=[mes[1]],
                  start=start,
                  stop=end)
-    streamer = Fastplayback(vis_q=vis_q, analyze_q=analyze_q, interval=1, query=param)
+    streamer = Fastplayback(vis_q=vis_q, analyze_q=analyze_q, interval=.5, query=param)
     streamer.start()
     analyzer = DelayAnalyzer(vis_q=vis_q, analyze_q=analyze_q, config=analyze_setting)
     analyzer.start()
@@ -107,7 +109,7 @@ desc = Div(text=open(join(dirname(__file__), "des.html")).read(), width=800)
 hover = HoverTool(tooltips=[("RTT", "@y"), ("Time", "@time")])
 
 p = figure(width=600, height=400, x_axis_type="datetime", title="probe %d -- msm %d" % (mes_list[0][1], mes_list[0][0]),
-           tools="xpan,xwheel_zoom,xbox_zoom,reset")
+           tools="xpan,xwheel_zoom,xbox_zoom,reset,save")
 p.add_tools(hover)
 
 p.border_fill_color = "whitesmoke"
@@ -130,7 +132,7 @@ analyze_setting['minlen'] = minlen.value
 
 doc = curdoc()
 doc.add_root(column(desc, row(bias, minlen), p))
-doc.add_periodic_callback(update, 500)
+doc.add_periodic_callback(update, 50)
 doc.title = "RTT Streaming"
 
 #for st, ana in mes_worker:
