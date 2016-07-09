@@ -7,7 +7,7 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import IntVector
 changepoint = importr('changepoint')
 
-MAX_LEN = 20
+MAX_LEN = 50
 
 class DelayAnalyzer(Process):
     def __init__(self, analyze_q, vis_q, config):

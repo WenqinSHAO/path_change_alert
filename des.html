@@ -1,0 +1,49 @@
+<style>
+h1 {
+    margin: 1em 0 0 0;
+    color: #2e484c;
+    font-family: 'Julius Sans One', sans-serif;
+    font-size: 1.8em;
+}
+h2 {
+    margin: 1em 0 0 0;
+    color: #2e484c;
+    font-family: 'Julius Sans One', sans-serif;
+    font-size: 1.4em;
+}
+a:link {
+    font-weight: bold;
+    text-decoration: none;
+    color: #0d8ba1;
+}
+a:visited {
+    font-weight: bold;
+    text-decoration: none;
+    color: #1a5952;
+}
+a:hover, a:focus, a:active {
+    text-decoration: underline;
+    color: #9685BA;
+}
+p {
+    font: "Libre Baskerville", sans-serif;
+    text-align: justify;
+    text-justify: inter-word;
+    width: 80%;
+    max-width: 800;
+}
+</style>
+
+<h1>Change detection for streaming RTT measurements</h1>
+
+<p>
+    This demo visualizes and analyzes the RTT measurements from <a href="https://atlas.ripe.net">RIPE Atlas</a> in quasi-realtime.
+</p>
+<h2>Parameters</h2>
+<p>
+    <b>RTT bias:</b> RTT measurements is first subtracted by a auto-upgraded baseline and then added by this bias value. Smaller the bias, more senstive the change detection will be.
+</p>
+<p>
+    <b>Minimum data length:</b> it is the shortest data eligible for change detection.
+</p>
+<br />
