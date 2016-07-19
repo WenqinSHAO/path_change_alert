@@ -14,8 +14,8 @@ class DelayAnalyzer(Process):
         self.analyze = analyze_q
         self.vis = vis_q
         self.config = config
-        self.rec_raw = []
-        self.rec_rtt = []
+        self.rec_raw = [] # the entire json object
+        self.rec_rtt = [] # only the min RTT value
         #self.baseline = 9999
         self.bias = 10
         self.minlen = 10
@@ -52,10 +52,13 @@ class DelayAnalyzer(Process):
                             data = data[-MAX_LEN:]
                             adj = data_len - MAX_LEN
 
-                        data_ref = np.max(np.min(data)-np.std(data)*1.75, 0)
-                        #self.baseline = data_min
+                        data_std = np.abs(np.std(data[1:-3]))
+                        data_ref = np.max(np.min(data)-data_std*1.75, 0)
+
+
                         data = [i-data_ref+self.bias for i in data]
                         self.vis.put(dict(id=id, type='base', rec=dict(x=[tstp_dt], y=[data_ref - self.bias])))
+                        self.vis.put(dict(id=id, type='std', rec=dict(x=[tstp_dt], y=[data_std])))
 
                         data = IntVector(data)
                         cpt = changepoint.cpts(changepoint.cpt_meanvar(data, test_stat='Poisson', method='PELT'))

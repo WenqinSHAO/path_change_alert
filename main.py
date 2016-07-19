@@ -5,8 +5,8 @@ from delayAnalyzer import DelayAnalyzer
 from multiprocessing import Queue, Manager
 from ripe.atlas.sagan import PingResult
 from bokeh.plotting import curdoc, figure
-from bokeh.models import ColumnDataSource, Slider, Div, HoverTool, Range1d
-from bokeh.layouts import row, column
+from bokeh.models import ColumnDataSource, Slider, Div, HoverTool, Range1d, LinearAxis
+from bokeh.layouts import row, column, gridplot
 import Queue as NQ
 from os.path import dirname, join
 import datetime
@@ -50,7 +50,11 @@ def update():
     else:
         if task != 'STOP':
             if task['type'] == 'base':
-                base.stream(dict(x=task['rec']['x'], y=task['rec']['y'], time=[datetime_to_string(i) for i in task['rec']['x']]))
+                base.stream(dict(x=task['rec']['x'], y=task['rec']['y'],
+                                 time=[datetime_to_string(i) for i in task['rec']['x']]))
+            elif task['type'] == 'std':
+                std.stream(dict(x=task['rec']['x'], y=task['rec']['y'],
+                                time=[datetime_to_string(i) for i in task['rec']['x']]))
             else:
                 one_mes = PingResult(task['rec'])
                 new_data = dict(x=[one_mes.created], y=[one_mes.rtt_min], time=[datetime_to_string(one_mes.created)])
@@ -79,11 +83,12 @@ vis_q = Queue()
 analyze_q = Queue()
 analyze_setting = Manager().dict(bias=10, minlen=10)
 
-start = string_to_epoch('21/01/2016 17:00:00')
-#start = string_to_epoch('20/01/2016 06:00:00')
-end = string_to_epoch('27/01/2016 06:00:00')
-mes_list = [(1010, 21959)]
-#mes_list=[(1010, 10772)]
+#start = string_to_epoch('21/01/2016 17:00:00')
+start = string_to_epoch('18/01/2016 06:00:00')
+end = string_to_epoch('25/01/2016 06:00:00')
+#mes_list = [(1010, 21959)]
+mes_list = [(1010, 17203)]
+#mes_list = [(1010, 17824)]
 mes_worker = []
 
 for mes in mes_list:
@@ -101,6 +106,7 @@ mes = ColumnDataSource(dict(x=[], y=[], time=[]))
 alert = ColumnDataSource(dict(x=[], y=[], time=[]))
 loss = ColumnDataSource(dict(x=[], y=[], time=[]))
 base = ColumnDataSource(dict(x=[], y=[], time=[]))
+std = ColumnDataSource(dict(x=[], y=[], time=[]))
 rec = []
 tstp = []
 
@@ -108,21 +114,30 @@ desc = Div(text=open(join(dirname(__file__), "des.html")).read(), width=800)
 
 hover = HoverTool(tooltips=[("RTT", "@y"), ("Time", "@time")])
 
-p = figure(width=600, height=400, x_axis_type="datetime", title="probe %d -- msm %d" % (mes_list[0][1], mes_list[0][0]),
-           tools="xpan,xwheel_zoom,xbox_zoom,reset,save")
+p = figure(width=1000, height=400, x_axis_type="datetime", title="probe %d -- msm %d" % (mes_list[0][1], mes_list[0][0]),
+           tools="xpan,xwheel_zoom,xbox_zoom,reset,save", toolbar_location="above")
+
 p.add_tools(hover)
 
 p.border_fill_color = "whitesmoke"
 p.min_border_left = 80
+p.min_border_right = 80
 p.line(x='x', y='y', source=mes)
 p.circle(x='x', y='y', source=mes, fill_color="white", size=8)
 p.square(x='x', y='y', source=alert, line_color="orange", fill_color='red', size=10, line_width=3)
 p.circle(x='x', y='y', source=loss, fill_color="grey", size=8, line_color='black', line_width=3)
 p.line(x='x', y='y', source=base, line_color='green', line_width=3, alpha=0.5)
+
 p.xaxis.axis_label = 'Time'
 p.yaxis.axis_label = 'RTT (ms)'
-#p.x_range = Range1d(string_to_epoch('20/01/2016 06:00:00')*1000, string_to_epoch('25/01/2016 06:00:00')*1000)
 
+p.extra_y_ranges = {"y_bis": Range1d(start=-2, end=20)}
+p.add_layout(LinearAxis(y_range_name="y_bis", axis_label="|std| (ms)"), 'right')
+p.line(x='x', y='y', source=std, line_color='grey', line_width=3, alpha=0.5, y_range_name='y_bis')
+
+
+
+#p.x_range = Range1d(string_to_epoch('20/01/2016 06:00:00')*1000, string_to_epoch('25/01/2016 06:00:00')*1000)
 
 
 bias = Slider(title="RTT bias (ms)", value=10, start=0, end=50, step=1)
