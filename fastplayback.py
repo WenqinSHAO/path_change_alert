@@ -13,7 +13,7 @@ class Fastplayback(Process):
     it query entire the data for a given period first,
     and then playback each measurement one by one according to given interval.
 
-    AttributesL
+    Attributes:
     analyze_q (multiprocessing.Queue): where measurements is put one by one; an analysis process consumes the queue;
     query (dict): a dictionary contains query parameters
     interval (float): streaming interval between two measurements
