@@ -118,7 +118,7 @@ analyze_setting = Manager().dict(bias=10, minlen=10)
 # measurement query for fastplayback
 start = string_to_epoch('18/01/2016 06:00:00')
 end = string_to_epoch('25/01/2016 06:00:00')
-mes_list = [(1010, 23762)]
+mes_list = [(1010, 10772)]
 
 mes_worker = []
 
