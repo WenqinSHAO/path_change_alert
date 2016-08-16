@@ -78,7 +78,7 @@ Then visit this url [http://127.0.0.1:8080/main](http://127.0.0.1:8080/main) in 
 ![Example](/example.png)
 
 ## Reference
-[1] M. Luckie, A. Dhamdhere, D. Clark, B. Huffaker, and K. Claffy, “Challenges in Inferring Internet Interdomain Congestion,” in Proceedings of the 2014 Conference on Internet Measurement Conference - IMC ’14, 2014, pp. 15–22.
-[2] B. Chandrasekaran, A. Berger, and M. Luckie, “A Server-to-Server View of the Internet,” CoNext, 2015.
-[3] I. A. Eckley, P. Fearnhead, and R. Killick, “Analysis of Changepoint Models,” Bayesian Time Ser. Model., no. January, pp. 205–224, 2011.
-[4] R. Killick and I. Eckley, “changepoint: An R Package for changepoint analysis,” Lancaster Univ., vol. 58, no. 3, pp. 1–15, 2013.
+1. M. Luckie, A. Dhamdhere, D. Clark, B. Huffaker, and K. Claffy, “Challenges in Inferring Internet Interdomain Congestion,” in Proceedings of the 2014 Conference on Internet Measurement Conference - IMC ’14, 2014, pp. 15–22.
+2. B. Chandrasekaran, A. Berger, and M. Luckie, “A Server-to-Server View of the Internet,” CoNext, 2015.
+3. I. A. Eckley, P. Fearnhead, and R. Killick, “Analysis of Changepoint Models,” Bayesian Time Ser. Model., no. January, pp. 205–224, 2011.
+4. R. Killick and I. Eckley, “changepoint: An R Package for changepoint analysis,” Lancaster Univ., vol. 58, no. 3, pp. 1–15, 2013.
