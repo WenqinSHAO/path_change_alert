@@ -55,7 +55,7 @@ RTT measurements during congestion differ from normal cases in following two asp
 First, the average RTT shall rise.
 Over one same path, RTT is mainly decided by the queue length as the propagation delay remain unchanged.
 During congestion, queue length naturally increases with the traffic demand and hence augments as well RTT.
-Second, the variability of RTT shall as well increase.
+Second, the variability of RTT shall as well increase. (why exactly?)
 TCP overreacts to congestion on a microscopic time scale: increase sending rate util packet loss;
 once packet lost, half the sending rate.
 This puts the traffic demand in constant fluctuation which alters as well the queue length.
