@@ -1,11 +1,28 @@
 # Online detection of RTT changes and congestion
 
+## The demo
+The repository provides a working demo/toy for this project.
+It plots streaming RTT measurements collected from [RIPE Atlas](https://atlas.ripe.net) and marks the moment of change with a short delay.
+The project is mainly built with python. R library *changpoint* is used to do the real detection. 
+[bokeh](http://bokeh.pydata.org) is employed to plot streaming data.
+The toy can be run by first executing the following command:
+```
+bokeh serve main.py  --address=0.0.0.0 --port=8080 --host='*'
+```
+
+If you are runing the project within a python virtual environment, use the following command:
+ ```
+ BOKEH_DEV=true BOKEH_RESOURCES=server-dev bokeh serve main.py  --address=0.0.0.0 --port=8080 --host='*'
+
+```
+Then visit this url [http://127.0.0.1:8080/main](http://127.0.0.1:8080/main) in you favorite browser.
+![Example](/online_cpt.gif)
+
 ## Background and motivation
 Network congestion is one major factor that impacts the transmission performance over the internet. 
 It increases transmission delay and decreases goodput.
-The very essence of congestion is lack of capacity in front of overwhelming traffic.
 
-In order to control or even avoid congestion, ones has to detect it in first place.
+In order to avoid congestion, ones has to detect it in first place.
 From an end host point of view, packet loss is a sign of congestion and triggers
 TCP to slow down the transmission rate.
 This approach doesn't avoid congestion. 
@@ -22,11 +39,10 @@ happens on a time scale of several months or even longer.
 Second, a network operator can as well carefully plan the routing of traffic
  to make better use of currently available network capacity before next upgrade.
 
-However, detecting congestion could be challenging from that perspective.
-As a matter of fact, congestion doesn't necessarily only happen within the local network.
+However, detecting congestion could be challenging from that a network operator perspective, 
+when congestion happens outside one's network, somewhere in Internet.
 In such case, the network operator lacks the bandwidth or queuing information that is
 only locally available to deduce the the existence of remote congestion.
-
 
 A part of the solution is already available. [1,2] proposed a method to detect
 reoccurring congestion caused by under-provisioning using only RTT measurements.
@@ -64,18 +80,6 @@ The resulting RTT is thus very close to physical minimum and remain stable.
 ### Detect changes in RTT
 Statistical tool *changepoint analysis* [3,4] can be leveraged to detect significant changes in RTT measurements.
 
-
-## The demo
-The repository provides a working demo/toy for this project.
-It plots streaming RTT measurements collected from [RIPE Atlas](https://atlas.ripe.net) and marks the moment of change with a short delay.
-The project is mainly built with python. R library *changpoint* is used to do the real detection. 
-[bokeh](http://bokeh.pydata.org) is employed to plot streaming data.
-The toy can be run by first executing the following command:
-```
-bokeh serve main.py  --address=0.0.0.0 --port=8080 --host='*'
-```
-Then visit this url [http://127.0.0.1:8080/main](http://127.0.0.1:8080/main) in you favorite browser.
-![Example](/example.png)
 
 ## Reference
 1. M. Luckie, A. Dhamdhere, D. Clark, B. Huffaker, and K. Claffy, “Challenges in Inferring Internet Interdomain Congestion,” in Proceedings of the 2014 Conference on Internet Measurement Conference - IMC ’14, 2014, pp. 15–22.
