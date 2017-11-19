@@ -1,3 +1,4 @@
+import math
 from ripe.atlas.sagan import PingResult
 from multiprocessing import Process
 import Queue
@@ -80,11 +81,12 @@ class DelayAnalyzer(Process):
                         # calculated the absolute value of std regardless last three measurements
                         # where changes may reside
                         # TODO: need justification, why last three ignored
-                        data_std = np.abs(np.std(data[1:-3]))
+                        #data_std = np.abs(np.std(data[1:-3]))
+                        data_std = np.abs(np.std(data))
                         # calculated the baseline need to be subtracted
                         # the choice of baseline
                         # TODO: need justification, why this baseline
-                        data_ref = np.max(np.min(data)-data_std*1.75, 0)
+                        data_ref = np.max(np.min(data)-math.pow(data_std, 1.5), 0)
                         data = [i-data_ref+self.bias for i in data]
 
                         # queuing the baseline and std
