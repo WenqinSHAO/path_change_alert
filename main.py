@@ -25,6 +25,7 @@ import pytz
 epoch = datetime.datetime.utcfromtimestamp(0)
 epoch = epoch.replace(tzinfo=pytz.UTC)
 
+
 def string_to_epoch(str):
     """ translate an UTC time string to epoch time
 
@@ -84,8 +85,9 @@ def update():
                                  time=[datetime_to_string(i) for i in task['rec']['x']]))
             # update the data standard variation
             elif task['type'] == 'std':
-                std.stream(dict(x=task['rec']['x'], y=task['rec']['y'],
-                                time=[datetime_to_string(i) for i in task['rec']['x']]))
+                pass
+                #std.stream(dict(x=task['rec']['x'], y=task['rec']['y'],
+                #                time=[datetime_to_string(i) for i in task['rec']['x']]))
             else:
                 # for the rest of the case, in task['rec'] resides a sagan measurement object, thus treated differently
                 one_mes = PingResult(task['rec'])
@@ -106,19 +108,20 @@ def update():
                         new_data['y'] = [20]
                         loss.stream(new_data)
         else:
-            print 'BOKEH: received STOP signal.'
+            print 'BOKEH: received STOP signal %r.' % task
 
 # queue where data for visualization is put
 vis_q = Queue()
 # queue where date for analyze (change detection) is put
 analyze_q = Queue()
 # dict storing detection settings share between Analyzer and Boken callback
-analyze_setting = Manager().dict(bias=10, minlen=10)
+analyze_setting = Manager().dict(bias=20, minlen=10)
 
 # measurement query for fastplayback
-start = string_to_epoch('18/01/2016 06:00:00')
-end = string_to_epoch('25/01/2016 06:00:00')
-mes_list = [(1010, 10772)]
+start = string_to_epoch('18/10/2016 06:00:00')
+end = string_to_epoch('18/10/2016 14:00:00')
+#mes_list = [(1010, 11037)]
+mes_list = [(1010, 27711)]
 
 mes_worker = []
 
@@ -140,7 +143,7 @@ mes = ColumnDataSource(dict(x=[], y=[], time=[]))
 alert = ColumnDataSource(dict(x=[], y=[], time=[]))
 loss = ColumnDataSource(dict(x=[], y=[], time=[]))
 base = ColumnDataSource(dict(x=[], y=[], time=[]))
-std = ColumnDataSource(dict(x=[], y=[], time=[]))
+#std = ColumnDataSource(dict(x=[], y=[], time=[]))
 # local copy for measurement data, updated in bokeh call back
 rec = []
 tstp = []
@@ -153,7 +156,7 @@ hover = HoverTool(tooltips=[("RTT", "@y"), ("Time", "@time")])
 
 # bohek plotting canvas config
 p = figure(width=1000, height=400, x_axis_type="datetime", title="probe %d -- msm %d" % (mes_list[0][1], mes_list[0][0]),
-           tools="xpan,xwheel_zoom,xbox_zoom,reset,save", toolbar_location="above")
+           tools="pan, xpan, ypan, xwheel_zoom, ywheel_zoom, undo, redo, reset, save", toolbar_location="above")
 p.add_tools(hover)
 p.border_fill_color = "whitesmoke"
 p.min_border_left = 80
@@ -170,13 +173,13 @@ p.xaxis.axis_label = 'Time'
 p.yaxis.axis_label = 'RTT (ms)'
 
 # add a secondary axis for data absolute std
-p.extra_y_ranges = {"y_bis": Range1d(start=-2, end=20)}
-p.add_layout(LinearAxis(y_range_name="y_bis", axis_label="abs std (ms)"), 'right')
-p.line(x='x', y='y', source=std, line_color='grey', line_width=3, alpha=0.5, y_range_name='y_bis')
+#p.extra_y_ranges = {"y_bis": Range1d(start=-2, end=20)}
+#p.add_layout(LinearAxis(y_range_name="y_bis", axis_label="abs std (ms)"), 'right')
+#p.line(x='x', y='y', source=std, line_color='grey', line_width=3, alpha=0.5, y_range_name='y_bis')
 
 
 # bokeh slider tools for getting bias and data minimum length settings
-bias = Slider(title="RTT bias (ms)", value=10, start=0, end=50, step=1)
+bias = Slider(title="RTT bias (ms)", value=40, start=0, end=100, step=5)
 minlen = Slider(title="Minimum data length", value=10, start=4, end=50, step=1)
 analyze_setting['bias'] = bias.value
 analyze_setting['minlen'] = minlen.value
